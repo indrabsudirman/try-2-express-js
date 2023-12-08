@@ -1,7 +1,7 @@
-const fs = require("fs");
+const fs = require('fs');
 
 const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
+  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
 );
 
 exports.checkID = (req, res, next, val) => {
@@ -9,8 +9,8 @@ exports.checkID = (req, res, next, val) => {
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({
       requestedAt: req.requestTime,
-      status: "fail",
-      message: "Invalid ID",
+      status: 'fail',
+      message: 'Invalid ID',
     });
   }
   next();
@@ -20,8 +20,8 @@ exports.checkBody = (req, res, next) => {
   if (!req.body.name || !req.body.difficulty) {
     return res.status(400).json({
       requestedAt: req.requestTime,
-      status: "fail",
-      message: "Missing name, difficulty object",
+      status: 'fail',
+      message: 'Missing name, difficulty object',
     });
   }
   next();
@@ -30,7 +30,7 @@ exports.checkBody = (req, res, next) => {
 exports.getTours = (req, res) => {
   res.status(200).json({
     requestedAt: req.requestTime,
-    status: "success",
+    status: 'success',
     result: tours.length,
     data: {
       tours: tours,
@@ -49,7 +49,7 @@ exports.getTour = (req, res) => {
 
   res.status(200).json({
     requestedAt: req.requestTime,
-    status: "success",
+    status: 'success',
     data: {
       tour,
     },
@@ -59,31 +59,32 @@ exports.getTour = (req, res) => {
 exports.createTour = (req, res) => {
   console.log(req.body);
   const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
+  // eslint-disable-next-line node/no-unsupported-features/es-syntax
+  const newTour = { id: newId, ...req.body };
 
   tours.push(newTour);
 
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
-    (err) => {
+    () => {
       res.status(201).json({
         requestedAt: req.requestTime,
-        status: "success",
+        status: 'success',
         data: {
           tours: newTour,
         },
       });
-    }
+    },
   );
 };
 
 exports.updateTour = (req, res) => {
   res.status(200).json({
     requestedAt: req.requestTime,
-    status: "success",
+    status: 'success',
     data: {
-      tour: "<Updated tour here ...>",
+      tour: '<Updated tour here ...>',
     },
   });
 };
@@ -91,7 +92,7 @@ exports.updateTour = (req, res) => {
 exports.deleteTour = (req, res) => {
   res.status(204).json({
     requestedAt: req.requestTime,
-    status: "success",
+    status: 'success',
     data: null,
   });
 };
