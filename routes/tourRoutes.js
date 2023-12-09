@@ -5,14 +5,12 @@ const {
   getTour,
   updateTour,
   deleteTour,
-  checkID,
-  checkBody,
 } = require('../controllers/tourController');
 
 const router = express.Router();
 
 //Middleware untuk route "id"
-router.param('id', checkID);
+// router.param('id', checkID);
 
 //Perlu buat juga, multiple middleware, tujuannya, sebelum ke handler Post createTour,
 //ada pengecekan dulu, data yg mau dikirim sudah ada value dari model yg required
@@ -23,7 +21,7 @@ router.param('id', checkID);
 //If not, send back 400 (bad request)
 //Add it to the post handler stack
 
-router.route('/').get(getTours).post(checkBody, createTour);
+router.route('/').get(getTours).post(createTour);
 
 router.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
 

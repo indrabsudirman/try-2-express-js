@@ -1,40 +1,44 @@
-const fs = require('fs');
+// const fs = require('fs');
+const Tour = require('../models/tourModel');
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
-);
+//Testing read from JSON file
+// const tours = JSON.parse(
+//   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
+// );
 
-exports.checkID = (req, res, next, val) => {
-  console.log(`Tour id is : ${val}`);
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({
-      requestedAt: req.requestTime,
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-  next();
-};
+// Check id no need anymore, just to show how middleware work
+// exports.checkID = (req, res, next, val) => {
+//   console.log(`Tour id is : ${val}`);
+//   if (req.params.id * 1 > tours.length) {
+//     return res.status(404).json({
+//       requestedAt: req.requestTime,
+//       status: 'fail',
+//       message: 'Invalid ID',
+//     });
+//   }
+//   next();
+// };
 
-exports.checkBody = (req, res, next) => {
-  if (!req.body.name || !req.body.difficulty) {
-    return res.status(400).json({
-      requestedAt: req.requestTime,
-      status: 'fail',
-      message: 'Missing name, difficulty object',
-    });
-  }
-  next();
-};
+//No need middleware to check body, because mongoose take care about that process
+// exports.checkBody = (req, res, next) => {
+//   if (!req.body.name || !req.body.difficulty) {
+//     return res.status(400).json({
+//       requestedAt: req.requestTime,
+//       status: 'fail',
+//       message: 'Missing name, difficulty object',
+//     });
+//   }
+//   next();
+// };
 
 exports.getTours = (req, res) => {
   res.status(200).json({
     requestedAt: req.requestTime,
     status: 'success',
-    result: tours.length,
-    data: {
-      tours: tours,
-    },
+    // result: tours.length,
+    // data: {
+    //   tours: tours,
+    // },
   });
 };
 
@@ -44,39 +48,46 @@ exports.getTour = (req, res) => {
   const id = req.params.id * 1;
   console.log(typeof id);
 
-  const tour = tours.find((el) => el.id === id);
-  console.log(tour);
+  // const tour = tours.find((el) => el.id === id);
+  // console.log(tour);
 
   res.status(200).json({
     requestedAt: req.requestTime,
     status: 'success',
-    data: {
-      tour,
-    },
+    // data: {
+    //   tour,
+    // },
   });
 };
 
-exports.createTour = (req, res) => {
+exports.createTour = async (req, res) => {
   console.log(req.body);
-  const newId = tours[tours.length - 1].id + 1;
-  // eslint-disable-next-line node/no-unsupported-features/es-syntax
-  const newTour = { id: newId, ...req.body };
 
-  tours.push(newTour);
+  try {
+    // const newId = tours[tours.length - 1].id + 1;
+    // eslint-disable-next-line node/no-unsupported-features/es-syntax
+    // const newTour = { id: newId, ...req.body };
 
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    () => {
-      res.status(201).json({
-        requestedAt: req.requestTime,
-        status: 'success',
-        data: {
-          tours: newTour,
-        },
-      });
-    },
-  );
+    //No need this style, will use Model.create and using async await
+    // const newTour = new Tour({});
+    // newTour.save();
+
+    const newTour = await Tour.create(req.body);
+
+    res.status(201).json({
+      requestedAt: req.requestTime,
+      status: 'success',
+      data: {
+        tours: newTour,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      requestedAt: req.requestTime,
+      status: 'fail',
+      message: `Error while save new data ${err}`,
+    });
+  }
 };
 
 exports.updateTour = (req, res) => {
