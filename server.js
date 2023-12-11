@@ -22,8 +22,10 @@ dotenv.config({ path: './config.env' });
 
 //Connect to the local
 mongoose.connect(process.env.DB_LOCAL).then(
-  (con) => {
-    console.log(con.connections);
+  () => {
+    // (con) => {
+    //To log all connections
+    // console.log(con.connections);
     console.log('Success connected!');
   },
   (err) => {

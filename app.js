@@ -1,11 +1,13 @@
 const express = require('express');
 
 const morgan = require('morgan');
+const AppError = require('./utils/appError');
 
 const app = express();
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const globalErrorController = require('./controllers/errorController');
 
 // 1 Middlewares
 console.log(process.env.NODE_ENV);
@@ -38,11 +40,21 @@ app.use('/api/v1/users', userRouter);
 
 //Handle unhandle route
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    requestedAt: req.requestTime,
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server!`,
-  });
+  // res.status(404).json({
+  //   requestedAt: req.requestTime,
+  //   status: 'fail',
+  //   message: `Can't find ${req.originalUrl} on this server!`,
+  // });
+
+  //Before create class AppError
+  // const err = new Error(`Can't find ${req.originalUrl} on this server!`);
+  // err.status = 'fail';
+  // err.statusCode = 404;
+
+  //Using class AppError
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
+
+app.use(globalErrorController);
 
 module.exports = app;
